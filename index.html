@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase + HTML</title>
+</head>
+<body>
+  <h1>Logowanie użytkowników</h1>
+
+  <div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Hasło">
+    <br><br>
+    <button onclick="zarejestruj()">Zarejestruj</button>
+    <button onclick="zaloguj()">Zaloguj</button>
+    <button onclick="wyloguj()">Wyloguj</button>
+  </div>
+
+  <p id="status">Nie jesteś zalogowany</p>
+
+  <!-- Biblioteka Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // === TUTAJ WKLEJ SWOJE DANE ===
+    const SUPABASE_URL = 'https://qafuuzsllpvpydlgjlxh.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_2GPuOfuvYTyYWkdnJuXL6g_8vhe3Bdz';
+
+    // Tworzymy klienta
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Sprawdź, czy użytkownik jest już zalogowany
+    async function sprawdzSesje() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        document.getElementById('status').textContent = 
+          `Zalogowany jako: ${session.user.email}`;
+      } else {
+        document.getElementById('status').textContent = 'Nie jesteś zalogowany';
+      }
+    }
+
+  // Rejestracja
+  async function zarejestruj() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      alert('Błąd rejestracji: ' + error.message);
+      return;
+    }
+
+    // Sprawdzenie czy email już istnieje
+    // (gdy Confirm email jest włączone, Supabase zwraca usera bez identities)
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      alert('User already registered – konto z tym emailem już istnieje. Zaloguj się lub zresetuj hasło.');
+      return;
+    }
+
+    // Prawdziwa nowa rejestracja
+    alert('Konto utworzone! Sprawdź skrzynkę e-mail (jeśli potwierdzenie jest włączone).');
+    sprawdzSesje();
+  }
+
+    // Logowanie
+    async function zaloguj() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        alert('Błąd logowania: ' + error.message);
+      } else {
+        alert('Zalogowano pomyślnie!');
+        sprawdzSesje();
+      }
+    }
+
+    // Wylogowanie
+    async function wyloguj() {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        alert('Błąd: ' + error.message);
+      } else {
+        alert('Wylogowano');
+        sprawdzSesje();
+      }
+    }
+
+    // Nasłuchiwanie zmian stanu logowania
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      sprawdzSesje();
+    });
+
+    // Sprawdź sesję przy starcie
+    sprawdzSesje();
+  </script>
+</body>
+</html>
