@@ -1,0 +1,156 @@
+body{
+    background-image: url("image.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    margin: 0px;
+}
+
+#box1{
+    background: linear-gradient(to top,rgb(255, 255, 255, 0.9), rgba(55, 186, 238, 0.9));
+    border: 5px solid;
+    border-color: rgb(53, 74, 87);
+    border-radius: 25px;
+    height: 550px;
+    width: 400px;
+    position: relative;
+
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 80px;
+}
+
+#box2{
+    color: rgb(28, 4, 32);
+    font-family: Arial;
+    font-weight: 1000;
+    font-style: oblique;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#button1{
+    height: 50px;
+    width: 200px;
+    
+    position: relative;
+    top: 180px;
+    left: 100px;
+
+    background: linear-gradient(rgb(18, 4, 145), rgb(112, 200, 235));
+    border-radius: 10px;
+    border-width: 4px;
+}
+
+#button1-1{
+    position: relative;
+    color: rgb(255, 255, 254);
+    top: -12px;
+}
+
+#napis2{
+        position: relative;
+        left: 38px;
+        top: 20px;
+
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#email{
+    border-width: 4px;
+    border-color: rgb(122, 13, 64);
+    position: relative;
+    left: 95px;
+    top: 100px;
+    height: 30px;
+    width: 200px;
+}
+
+#password{
+    border-width: 4px;
+    border-color: rgb(122, 13, 64);
+    position: relative;
+    left: 94px;
+    top: 150px;
+    height: 30px;
+    width: 200px;
+}
+
+#nazwa{
+    visibility: hidden;
+
+    border-width: 4px;
+    border-color: rgb(122, 13, 64);
+    position: relative;
+    left: 94px;
+    top: 160px;
+    height: 30px;
+    width: 200px;
+}
+
+#login0-1{
+    position: relative;
+    left: 145px;
+    top: 170px;
+}
+
+#button2-1{
+    width: 100px;
+    height: 20px;
+
+    position: relative;
+    left: 152px;
+    top: 154px;
+}
+
+#button2-2{
+    position: relative;
+    left: 0px;
+    top: -18px;
+}
+
+#button1-3{
+    position: absolute;
+    margin-top: 180px;
+    left: 80px;
+    height: 50px;
+    width: 240px;
+    background: linear-gradient(rgb(18, 4, 145), rgb(112, 200, 235));
+    border-radius: 10px;
+    border-width: 4px;
+    visibility: hidden;
+}
+
+#button1-4{
+    position: relative;
+    color: rgb(255, 255, 254);
+    top: -12px;
+}
+
+#button3-1{
+    height: 20px;
+    position: absolute;
+    left: 175px;
+    margin-top: 190px;
+    visibility: hidden;
+}
+
+#button3-2{
+    position: relative;
+    top: -17px;
+}
+
+#button1-5{
+    position: absolute;
+    visibility: hidden;
+}
+
+#status{
+    visibility: hidden;
+    position: relative;
+    top: 140px;
+    left: 37px;
+
+    font-weight: 1000;
+}

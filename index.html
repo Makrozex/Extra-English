@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpg" href="image.jpg">
+  <title>Extra English</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="box1">
+    
+    <div id="napis1"><h1 id="napis2">Extra English app</h1></div>
+
+    <div id="box2"></div>
+
+    <input type="email" id="email" placeholder="Email">
+
+    <input type="password" id="password" placeholder="Hasło" minlength="6" maxlength="15">
+
+    <input type="text" id="nazwa" placeholder="Nazwa" minlength="4" maxlength="12">
+
+    <br><br>
+
+    <button onclick="zarejestruj()" id="button1-3"><h1 id="button1-4">Zarejestruj</h1></button>
+
+    <button onclick="zaloguj()" class="rejestr" id="button1"><h1 id="button1-1">Zaloguj się</h1></button>
+
+    <button onclick="wyloguj()" id="button1-5">Wyloguj</button>
+
+    <br>
+
+    <button onclick="zmiana_na_login()" id="button3-1"><h4 id="button3-2">wróć</h4></button>
+
+    <h4 class="rejestr" id="login0-1">Nie masz konta?</h4>
+
+    <button class="rejestr" onclick="zmiana_na_rejestr()" id="button2-1"><h4 id="button2-2">zarejestuj się</h4></button>
+
+    <p id="status">Nie jesteś zalogowany</p>
+
+  </div>
+
+  <script>
+    function zmiana_na_rejestr() {
+      const password = document.getElementById("password");
+      const email = document.getElementById("email");
+      const rejestr3 = document.getElementById("button3-1");
+      const rejestr1 = document.getElementById("button1-3");
+      const rejestr4 = document.getElementById("nazwa");
+      const rejestr2 = document.querySelectorAll(".rejestr");
+
+      rejestr2.forEach(element => {
+        element.style.visibility = "hidden";
+      });
+
+      if (rejestr1) {
+        rejestr1.style.visibility = "visible";
+      };
+
+      if (rejestr3) {
+        rejestr3.style.visibility = "visible";
+      };
+
+      if (rejestr4) {
+        rejestr4.style.visibility = "visible";
+      };
+
+      email.style.top = "60px";
+      password.style.top = "110px";
+    }
+  </script>
+
+  <script>
+    function zmiana_na_login() {
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+      const rejestr3 = document.getElementById("button3-1");
+      const rejestr1 = document.getElementById("button1-3");
+      const rejestr4 = document.getElementById("nazwa");
+      const rejestr2 = document.querySelectorAll(".rejestr");
+
+      rejestr2.forEach(element => {
+        element.style.visibility = "visible";
+      });
+
+      if (rejestr1) {
+        rejestr1.style.visibility = "hidden";
+      };
+
+      if (rejestr3) {
+        rejestr3.style.visibility = "hidden";
+      };
+
+      if (rejestr4) {
+        rejestr4.style.visibility = "hidden";
+      };
+
+      email.style.top = "";
+      password.style.top = "";
+    }
+  </script>
+
+  <!-- Biblioteka Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // === TUTAJ WKLEJ SWOJE DANE ===
+    const SUPABASE_URL = 'https://qafuuzsllpvpydlgjlxh.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_2GPuOfuvYTyYWkdnJuXL6g_8vhe3Bdz';
+
+    // Tworzymy klienta
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Sprawdź, czy użytkownik jest już zalogowany
+    async function sprawdzSesje() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (session) {
+
+        const { data: profile } = await supabaseClient
+          .from("profiles")
+          .select("nick")
+          .eq("id", session.user.id)
+          .single();
+
+        const wyswietlanyNick = profile?.nick || session.user.email;
+        
+        document.getElementById('status').textContent = 
+          `Zalogowany jako: ${session.user.email}`;
+      } else {
+        document.getElementById('status').textContent = 'Nie jesteś zalogowany';
+      }
+    }
+
+  // Rejestracja
+  async function zarejestruj() {
+    const nick = document.getElementById("nazwa").value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!nick || !email || !password) {
+      alert("Wypełnij wszystkie pola");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          nick: nick
+        }
+      }
+    });
+
+    if (error) {
+      alert('Błąd rejestracji: ' + error.message);
+      console.log(error);
+      return;
+    }
+
+    // Sprawdzenie czy email już istnieje
+    // (gdy Confirm email jest włączone, Supabase zwraca usera bez identities)
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      alert('Konto z tym emailem już istnieje. Zaloguj się lub zresetuj hasło.');
+      return;
+    }
+
+    if (data.user) {
+      const { error: profileError } = await supabaseClient
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          nick: nick
+        });
+      
+      if (profileError) {
+        alert("Konto utworzone, ale nie udało się zapisać nazwy: " + profileError.message);
+      } else {
+        alert("Konto utworzone pomyślnie!");
+      }
+
+      sprawdzSesje();
+    }
+
+    // Prawdziwa nowa rejestracja
+    alert('Konto utworzone! Sprawdź skrzynkę e-mail (jeśli potwierdzenie jest włączone).');
+    sprawdzSesje();
+  }
+
+    // Logowanie
+    async function zaloguj() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        alert('Błąd logowania: ' + error.message);
+      } else {
+        alert('Zalogowano pomyślnie!');
+        sprawdzSesje();
+      }
+    }
+
+    // Wylogowanie
+    async function wyloguj() {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        alert('Błąd: ' + error.message);
+      } else {
+        alert('Wylogowano');
+        sprawdzSesje();
+      }
+    }
+
+    // Nasłuchiwanie zmian stanu logowania
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      sprawdzSesje();
+    });
+
+    // Sprawdź sesję przy starcie
+    sprawdzSesje();
+  </script>
+</body>
+</html>
